@@ -7,26 +7,15 @@ public class main {
     public static void main(String[] args) {
         String s1 = "ababcabcabababd";
         String s2 = "ababd";
-        int[] result = patternEx1(s1, s2);
+        try {
+            int result = search(s1, s2);
+            System.out.println(result);
+        } catch (Exception e) {
+            
+            e.printStackTrace();
+        }
       
-        if(result == null){
-            System.out.println("No result (pattern longer than text or empty input).\n");
-            return;
-        }
-
-        for(int i =0 ; i < result.length; i++){
-            System.out.println(result[i]);
-        }
-
-        if(foundFullMatch){
-            System.out.println("Full match found at s1 index: " + foundAt);
-            System.out.println("Saved matching positions (s1 -> s2):");
-            for(int k = 0; k < savedS1Positions.length; k++){
-                System.out.println("s1[" + savedS1Positions[k] + "]='" + s1.charAt(savedS1Positions[k]) + "'  ->  s2[" + savedS2Positions[k] + "]='" + s2.charAt(savedS2Positions[k]) + "'");
-            }
-        } else {
-            System.out.println("No full match was found.");
-        }
+       
     }
 
 
@@ -75,4 +64,32 @@ public class main {
 
         return values;
     }
+
+    //rabin karp  para evitar resolver os problemas na maioria dos casos em N^n
+    private static int search(String pat, String txt) {
+        int M = pat.length();// 1 atribuicao e 1 consulta
+        int N = txt.length();// 1 e 1
+        long patHash = hash(pat, M); // 1 atribuicao e 1 consulta
+        System.out.println(patHash);
+            for (int i = 0; i <= N - M; i++) {// N-M+1 iteracoes, cada iteracao 1 atribuicao e 2 consultas
+                long txtHash = hash(txt.substring(i, i+M), M); //2 atribuicoes e 1 consulta
+                if (patHash == txtHash) //umca omparacao
+                    return i; // ocorrência? colisão?
+            }
+            return N; // nenhuma ocorrência
+}
+
+private static long hash(String s, int M) {
+   long h = 0;
+   long Q = 101; // valorprimo
+   long R = 256; //valor da tabela ascii
+   for (int j = 0; j < M; j++)
+      h = (h * R + s.charAt(j)) % Q;// a forma de atribuir, no estado inicial h ta em zero
+      //conforme se avança vai preenchendo o hash
+   return h;
+}
+
+//No pior dos casos como dito no slide e demonstrado no codigo, a complexidade é O(NM) por conta das
+//múltiplas colisoes na montagem da lista. No melhor dos casos é O(N + M) quando não há colisões, ideal para
+//casos pequenos
 }
